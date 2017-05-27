@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<title>連続時刻入力用スクリプト</title>
+
+<textarea id="text" cols="60" rows="30"></textarea>
+
+<h3>ex1) 時:分の補完</h3>
+<p>
+<pre>
+12:00:00
+13
+</pre>
+のように入力し、Enterを押すと
+<pre>
+12:00:00
+12:00:13
+</pre>
+のように補完されます。
+
+<h3>ex2) 分の繰り越し補完</h3>
+<p>
+<pre>
+12:01:57
+06
+</pre>
+のように入力し、Enterを押すと
+<pre>
+12:01:57
+12:02:06
+</pre>
+のように補完されます。
+
+<h3>ex3) 時の繰り越し補完</h3>
+<p>
+<pre>
+12:59:57
+06
+</pre>
+のように入力し、Enterを押すと
+<pre>
+12:59:57
+13:00:06
+</pre>
+のように補完されます。
+
+<h3>ex4) 日の繰り越し補完</h3>
+<p>
+<pre>
+23:59:57
+06
+</pre>
+のように入力し、Enterを押すと
+<pre>
+23:59:57
+00:00:06
+</pre>
+のように補完されます。
+
+<script>
+  var text = document.getElementById('text');
+  
+  text.addEventListener('keydown', function(e) {
+    if (e.keyCode == 13) {
+      var cLine = text.value.lastIndexOf('\n', text.selectionStart) +1;
+      var pLine = text.value.lastIndexOf('\n', cLine -2) +1;
+      var cLineText = text.value.slice(cLine, text.selectionStart);
+      var pLineText = cLine != 0 ? text.value.slice(pLine, cLine -1) : '';
+      
+      // console.log(pLine + ')' + pLineText + '>' + cLine + ')' + cLineText);
+      var rs = pLineText.match(/(\d{2})\:(\d{2})\:(\d{2})/);
+      if (rs != null) {
+        var crs = cLineText.match(/(\d{2})/);
+        if (crs != null) {
+          var min = crs[1] <= rs[3] ? parseInt(rs[2]) +1 : parseInt(rs[2]);
+          var incHou = min == 60;
+          if (incHou) min = 0;
+          if (min < 10) min = '0' + min;
+          
+          var hou = incHou ? parseInt(rs[1]) +1 : parseInt(rs[1]);
+          if (hou >= 24) hou = 0;
+          if (hou < 10) hou = '0' + hou;
+          
+          text.value = 
+            (cLine != 0 ? text.value.slice(0, cLine) : '')
+            + hou + ':' + min + ':' + text.value.substr(cLine);
+        }
+      }
+    }
+  });
+  
+</script>
+
