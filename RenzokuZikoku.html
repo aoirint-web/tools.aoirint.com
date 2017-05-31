@@ -67,9 +67,9 @@
       var pLineText = cLine != 0 ? text.value.slice(pLine, cLine -1) : '';
       
       // console.log(pLine + ')' + pLineText + '>' + cLine + ')' + cLineText);
-      var rs = pLineText.match(/(\d{2})\:(\d{2})\:(\d{2})/);
+      var rs = pLineText.match(/^(\d{2})\:(\d{2})\:(\d{2})$/);
       if (rs != null) {
-        var crs = cLineText.match(/(\d{2})/);
+        var crs = cLineText.match(/^(\d{2})$/);
         if (crs != null) {
           var min = crs[1] <= rs[3] ? parseInt(rs[2]) +1 : parseInt(rs[2]);
           var incHou = min == 60;
