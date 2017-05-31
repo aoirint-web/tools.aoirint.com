@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<title>Excel to TeX</title>
+
+<p>
+<textarea id="source" cols="60" rows="20"></textarea><br>
+<input value="↓" type="button" onclick="doConvert()"><br>
+<textarea id="result" cols="60" rows="20"></textarea>
+
+<script>
+var s = document.getElementById('source');
+var r = document.getElementById('result');
+
+function doConvert(e) {
+  var t = s.value.replace(/\t/g, ' & ').replace(/\n/g, " \\\\\n");
+  var fn = t.indexOf("\n");
+  t = t.slice(0, fn) + ' \\hline' + t.substr(fn);
+  
+  var ln = t.lastIndexOf("\n");
+  t = t.slice(0, ln) + ' \\hline' + t.substr(ln);
+  
+  r.value = t;
+}
+
+
+</script>
