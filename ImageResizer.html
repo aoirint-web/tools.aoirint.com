@@ -24,6 +24,7 @@
 <input id="file" type="file">
 
 <input id="btn" value="変換" type="button">
+<input id="dl" value="ダウンロード" type="button">
 
 <p>
 <canvas id="cvs" width="256" height="256"></canvas>
@@ -39,6 +40,7 @@
   var btn = document.getElementById('btn');
   var cvs = document.getElementById('cvs');
   var ctx = cvs.getContext('2d');
+  var fName = null;
   var img = null;
   
   file.addEventListener('change', function() {
@@ -47,6 +49,17 @@
   
   btn.addEventListener('click', function() {
     doResize();
+  });
+  dl.addEventListener('click', function() {
+    var a = document.createElement('a');
+    var name = fName;
+    if (name.lastIndexOf('.') != -1) {
+      name = name.slice(0, name.lastIndexOf('.'));
+    }
+    
+    a.download = name + '_rsd.png';
+    a.href = cvs.toDataURL();
+    a.click();
   });
   
   w.addEventListener('change', function() {
@@ -91,6 +104,7 @@
     }
     
     var f = file.files[0];
+    fName = f.name;
     img = new Image();
     img.onload = function() {
       var iW = img.width;
