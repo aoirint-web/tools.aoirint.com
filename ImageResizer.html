@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Image Resizer</title>
+<style>
+  #cvs {
+    border: 2px solid red;
+  }
+</style>
+
+<table>
+<tr><td>オリジナル
+<td><label>幅 <input id="orgW" type="number" readonly></label>
+<td><label>高さ <input id="orgH" type="number" readonly></label>
+
+<tr><td>変換先
+<td><label>幅 <input id="w" type="number" min="1"></label>
+<td><label>高さ <input id="h" type="number" min="1"></label>
+<tr><td>
+<td><label>アスペクト比維持 <input id="asp" type="checkbox" checked="checked"></label>
+<td><label>比 <input id="p" type="number"> %</label>
+</table>
+
+<p>
+<input id="file" type="file">
+
+<input id="btn" value="変換" type="button">
+
+<p>
+<canvas id="cvs" width="256" height="256"></canvas>
+
+<script>
+  var orgW = document.getElementById('orgW');
+  var orgH = document.getElementById('orgH');
+  var w = document.getElementById('w');
+  var h = document.getElementById('h');
+  var asp = document.getElementById('asp');
+  var p = document.getElementById('p');
+  var file = document.getElementById('file');
+  var btn = document.getElementById('btn');
+  var cvs = document.getElementById('cvs');
+  var ctx = cvs.getContext('2d');
+  var img = null;
+  
+  file.addEventListener('change', function() {
+    doLoad();
+  });
+  
+  btn.addEventListener('click', function() {
+    doResize();
+  });
+  
+  w.addEventListener('change', function() {
+    var newAsp = w.value / h.value;
+    var orgAsp = orgW.value / orgH.value;
+    
+    if (asp.checked) {
+      if (newAsp != orgAsp) {
+        h.value = w.value / orgAsp;
+      }
+      
+      p.value = orgW.value / w.value * 100;
+    }
+    else {
+      p.value = '';
+    }
+  });
+  h.addEventListener('change', function() {
+    var newAsp = w.value / h.value;
+    var orgAsp = orgW.value / orgH.value;
+    
+    if (asp.checked) {
+      if (newAsp != orgAsp) {
+        w.value = h.value * orgAsp;
+      }
+      
+      p.value = orgH.value / h.value * 100;
+    }
+    else {
+      p.value = '';
+    }
+  });
+  
+  p.addEventListener('change', function() {
+    w.value = orgW.value * p.value/100;
+    h.value = orgH.value * p.value/100;
+  });
+  
+  function doLoad() {
+    if (file.files[0] == null) {
+      return;
+    }
+    
+    var f = file.files[0];
+    img = new Image();
+    img.onload = function() {
+      var iW = img.width;
+      var iH = img.height;
+      
+      cvs.width = w.value = orgW.value = iW;
+      cvs.height = h.value = orgH.value = iH;
+      p.value = 100;
+      
+      ctx.clearRect(0,0, cvs.width, cvs.height);
+      ctx.drawImage(img, 0,0, iW, iH);
+    };
+    img.src = URL.createObjectURL(f);
+  }
+  
+  function doResize() {
+    cvs.width = w.value;
+    cvs.height = h.value;
+    ctx.clearRect(0,0, cvs.width, cvs.height);
+    ctx.drawImage(img, 0,0, w.value, h.value);
+  }
+  
+  
+</script>
