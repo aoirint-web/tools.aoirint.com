@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<style>
+  #cvs {
+    border: 1px solid black;
+  }
+</style>
+
+<div style="display: flex;">
+  <canvas id="cvs" width="256" height="256"></canvas>
+  <div style="margin: .5em">
+    <p>
+    <label>R <input id="red" type="range" min="0" max="255" value="0"></label> <span id="redv">0</span><br>
+    <label>G <input id="green" type="range" min="0" max="255" value="0"></label> <span id="greenv">0</span><br>
+    <label>B <input id="blue" type="range" min="0" max="255" value="0"></label> <span id="bluev">0</span>
+
+    <p>
+    <input type="button" value="出力（ppm）" onclick="exportPPM();">
+  </div>
+</div>
+
+<p>
+<textarea id="text" cols="60" rows="20"></textarea>
+<p>
+<input type="button" value="ダウンロード（ppm）" onclick="dlPPM();">
+<input type="button" value="入力（ppm）" onclick="importPPM();">
+
+<script>
+  var cvs = document.getElementById('cvs');
+  var ctx = cvs.getContext('2d');
+  var er = document.getElementById('red');
+  var eg = document.getElementById('green');
+  var eb = document.getElementById('blue');
+  var erv = document.getElementById('redv');
+  var egv = document.getElementById('greenv');
+  var ebv = document.getElementById('bluev');
+  var et = document.getElementById('text');
+  var pixels = [];
+  for (var i=0; i<16; i++) {
+    pixels[i] = [];
+    for (var j=0; j<16; j++) {
+      pixels[i][j] = 0xffffff;
+    }
+  }
+  
+  er.addEventListener('change', function(e) { erv.innerText = er.value; });
+  eg.addEventListener('change', function(e) { egv.innerText = eg.value; });
+  eb.addEventListener('change', function(e) { ebv.innerText = eb.value; });
+  
+  cvs.addEventListener('click', function(e) {
+    pixels[Math.floor(e.x /16)][Math.floor(e.y /16)] = 
+        ((er.value & 0xff) << 16) | 
+        ((eg.value & 0xff) << 8) |
+        (eb.value & 0xff);
+    update();
+  });
+  
+  function update() {
+    for (var y=0; y<16; y++) {
+      for (var x=0; x<16; x++) {
+        var color = pixels[x][y];
+        var r = (color >> 16) & 0xff;
+        var g = (color >> 8) & 0xff;
+        var b = color & 0xff;
+        ctx.fillStyle = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+        ctx.fillRect(x*16, y*16, 16, 16);
+      }
+    }
+  }
+  
+  function exportPPM() {
+    var v = 'P3 16 16 255\n';
+
+    for (var y=0; y<16; y++) {
+      for (var x=0; x<16; x++) {
+        var color = pixels[x][y];
+        var r = (color >> 16) & 0xff;
+        var g = (color >> 8) & 0xff;
+        var b = color & 0xff;
+        
+        v += r + ' ' + g + ' ' + b;
+        if (x != 15) v += ' ';
+      }
+      v += '\n';
+    }
+    
+    et.value = v;
+  }
+  
+  
+  function loadPPMLine(line) {
+    var array = [];
+    if (line.match(/^\s*$/)) return array;
+    var j = -1;
+    for (var i=0; i<16; i++) {
+      var k = line.indexOf(' ', j+1);
+      var l = line.indexOf(' ', k+1);
+      var m = line.indexOf(' ', l+1);
+      if (m == -1) m = line.length;
+      
+      var rgb = [line.slice(j+1, k), line.slice(k+1, l), line.slice(l+1, m)];
+      array[i] = ((rgb[0] & 0xff) << 16) | ((rgb[1] & 0xff) << 8) | (rgb[2] & 0xff);
+      j = m;
+    }
+    return array;
+  }
+  
+  function importPPM() {
+    var i = et.value.indexOf('\n');
+    if (et.value.slice(0, i) != 'P3 16 16 255') {
+      return ;
+    }
+    
+    var px = [];
+    var k = 0;
+    var j = 0;
+    while ((j = et.value.indexOf('\n', i+1)) != -1) {
+      var line = loadPPMLine(et.value.slice(i+1, j));
+      for (var l=0; l<16; l++) {
+        px[k++] = line[l];
+      }
+      i = j;
+    }
+    px[k++] = loadPPMLine(et.value.substr(i));
+    
+    var result = [];
+    for (var c=0; c<16; c++) {
+      result[c] = [];
+      for (var r=0; r<16; r++) {
+        result[c][r] = px[r*16 +c];
+      }
+    }
+    
+    pixels = result;
+    update();
+  }
+  
+  function dlPPM() {
+    var a = document.createElement('a');
+    a.download = Date.now() + '.ppm';
+    a.href = 'data:image/ppm,' + encodeURIComponent(et.value);
+    a.click();
+  }
+  
+</script>
