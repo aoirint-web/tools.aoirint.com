@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<!-- <meta name="viewport" content="width=device-width,initial-scale=1"> -->
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>PPM Painter</title>
 
@@ -55,7 +55,10 @@
   eb.addEventListener('change', function(e) { ebv.innerText = eb.value; });
 
   cvs.addEventListener('click', function(e) {
-    pixels[Math.floor(e.x /16)][Math.floor(e.y /16)] =
+    const clickX = e.offsetX;
+    const clickY = e.offsetY;
+
+    pixels[Math.floor(clickX /16)][Math.floor(clickY /16)] =
         ((er.value & 0xff) << 16) |
         ((eg.value & 0xff) << 8) |
         (eb.value & 0xff);
