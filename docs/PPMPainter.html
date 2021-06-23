@@ -5,6 +5,9 @@
   }
 </style>
 
+<p>
+  <a href="/">Go Back</a>
+
 <div style="display: flex;">
   <canvas id="cvs" width="256" height="256"></canvas>
   <div style="margin: .5em">
@@ -41,19 +44,19 @@
       pixels[i][j] = 0xffffff;
     }
   }
-  
+
   er.addEventListener('change', function(e) { erv.innerText = er.value; });
   eg.addEventListener('change', function(e) { egv.innerText = eg.value; });
   eb.addEventListener('change', function(e) { ebv.innerText = eb.value; });
-  
+
   cvs.addEventListener('click', function(e) {
-    pixels[Math.floor(e.x /16)][Math.floor(e.y /16)] = 
-        ((er.value & 0xff) << 16) | 
+    pixels[Math.floor(e.x /16)][Math.floor(e.y /16)] =
+        ((er.value & 0xff) << 16) |
         ((eg.value & 0xff) << 8) |
         (eb.value & 0xff);
     update();
   });
-  
+
   function update() {
     for (var y=0; y<16; y++) {
       for (var x=0; x<16; x++) {
@@ -66,7 +69,7 @@
       }
     }
   }
-  
+
   function exportPPM() {
     var v = 'P3 16 16 255\n';
 
@@ -76,17 +79,17 @@
         var r = (color >> 16) & 0xff;
         var g = (color >> 8) & 0xff;
         var b = color & 0xff;
-        
+
         v += r + ' ' + g + ' ' + b;
         if (x != 15) v += ' ';
       }
       v += '\n';
     }
-    
+
     et.value = v;
   }
-  
-  
+
+
   function loadPPMLine(line) {
     var array = [];
     if (line.match(/^\s*$/)) return array;
@@ -96,20 +99,20 @@
       var l = line.indexOf(' ', k+1);
       var m = line.indexOf(' ', l+1);
       if (m == -1) m = line.length;
-      
+
       var rgb = [line.slice(j+1, k), line.slice(k+1, l), line.slice(l+1, m)];
       array[i] = ((rgb[0] & 0xff) << 16) | ((rgb[1] & 0xff) << 8) | (rgb[2] & 0xff);
       j = m;
     }
     return array;
   }
-  
+
   function importPPM() {
     var i = et.value.indexOf('\n');
     if (et.value.slice(0, i) != 'P3 16 16 255') {
       return ;
     }
-    
+
     var px = [];
     var k = 0;
     var j = 0;
@@ -121,7 +124,7 @@
       i = j;
     }
     px[k++] = loadPPMLine(et.value.substr(i));
-    
+
     var result = [];
     for (var c=0; c<16; c++) {
       result[c] = [];
@@ -129,16 +132,16 @@
         result[c][r] = px[r*16 +c];
       }
     }
-    
+
     pixels = result;
     update();
   }
-  
+
   function dlPPM() {
     var a = document.createElement('a');
     a.download = Date.now() + '.ppm';
     a.href = 'data:image/ppm,' + encodeURIComponent(et.value);
     a.click();
   }
-  
+
 </script>

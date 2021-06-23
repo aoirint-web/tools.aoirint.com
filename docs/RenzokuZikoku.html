@@ -2,7 +2,11 @@
 
 <title>連続時刻入力用スクリプト</title>
 
-<textarea id="text" cols="60" rows="30"></textarea>
+<p>
+  <a href="/">Go Back</a>
+
+<p>
+  <textarea id="text" cols="60" rows="30"></textarea>
 
 <h3>ex1) 時:分の補完</h3>
 <p>
@@ -58,14 +62,14 @@
 
 <script>
   var text = document.getElementById('text');
-  
+
   text.addEventListener('keydown', function(e) {
     if (e.keyCode == 13) {
       var cLine = text.value.lastIndexOf('\n', text.selectionStart) +1;
       var pLine = text.value.lastIndexOf('\n', cLine -2) +1;
       var cLineText = text.value.slice(cLine, text.selectionStart);
       var pLineText = cLine != 0 ? text.value.slice(pLine, cLine -1) : '';
-      
+
       // console.log(pLine + ')' + pLineText + '>' + cLine + ')' + cLineText);
       var rs = pLineText.match(/^(\d{2})\:(\d{2})\:(\d{2})$/);
       if (rs != null) {
@@ -75,18 +79,17 @@
           var incHou = min == 60;
           if (incHou) min = 0;
           if (min < 10) min = '0' + min;
-          
+
           var hou = incHou ? parseInt(rs[1]) +1 : parseInt(rs[1]);
           if (hou >= 24) hou = 0;
           if (hou < 10) hou = '0' + hou;
-          
-          text.value = 
+
+          text.value =
             (cLine != 0 ? text.value.slice(0, cLine) : '')
             + hou + ':' + min + ':' + text.value.substr(cLine);
         }
       }
     }
   });
-  
-</script>
 
+</script>

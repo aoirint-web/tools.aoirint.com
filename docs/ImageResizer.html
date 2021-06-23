@@ -7,6 +7,9 @@
   }
 </style>
 
+<p>
+  <a href="/">Go Back</a>
+
 <table>
 <tr><td>オリジナル
 <td><label>幅 <input id="orgW" type="number" readonly></label>
@@ -42,11 +45,11 @@
   var ctx = cvs.getContext('2d');
   var fName = null;
   var img = null;
-  
+
   file.addEventListener('change', function() {
     doLoad();
   });
-  
+
   btn.addEventListener('click', function() {
     doResize();
   });
@@ -56,21 +59,21 @@
     if (name.lastIndexOf('.') != -1) {
       name = name.slice(0, name.lastIndexOf('.'));
     }
-    
+
     a.download = name + '_rsd.png';
     a.href = cvs.toDataURL();
     a.click();
   });
-  
+
   w.addEventListener('change', function() {
     var newAsp = w.value / h.value;
     var orgAsp = orgW.value / orgH.value;
-    
+
     if (asp.checked) {
       if (newAsp != orgAsp) {
         h.value = w.value / orgAsp;
       }
-      
+
       p.value = orgW.value / w.value * 100;
     }
     else {
@@ -80,52 +83,52 @@
   h.addEventListener('change', function() {
     var newAsp = w.value / h.value;
     var orgAsp = orgW.value / orgH.value;
-    
+
     if (asp.checked) {
       if (newAsp != orgAsp) {
         w.value = h.value * orgAsp;
       }
-      
+
       p.value = orgH.value / h.value * 100;
     }
     else {
       p.value = '';
     }
   });
-  
+
   p.addEventListener('change', function() {
     w.value = orgW.value * p.value/100;
     h.value = orgH.value * p.value/100;
   });
-  
+
   function doLoad() {
     if (file.files[0] == null) {
       return;
     }
-    
+
     var f = file.files[0];
     fName = f.name;
     img = new Image();
     img.onload = function() {
       var iW = img.width;
       var iH = img.height;
-      
+
       cvs.width = w.value = orgW.value = iW;
       cvs.height = h.value = orgH.value = iH;
       p.value = 100;
-      
+
       ctx.clearRect(0,0, cvs.width, cvs.height);
       ctx.drawImage(img, 0,0, iW, iH);
     };
     img.src = URL.createObjectURL(f);
   }
-  
+
   function doResize() {
     cvs.width = w.value;
     cvs.height = h.value;
     ctx.clearRect(0,0, cvs.width, cvs.height);
     ctx.drawImage(img, 0,0, w.value, h.value);
   }
-  
-  
+
+
 </script>
