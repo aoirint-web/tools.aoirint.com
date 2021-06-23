@@ -54,7 +54,22 @@
   eg.addEventListener('change', function(e) { egv.innerText = eg.value; });
   eb.addEventListener('change', function(e) { ebv.innerText = eb.value; });
 
-  cvs.addEventListener('click', function(e) {
+  let drawing = false;
+  cvs.addEventListener('mousedown', function(e) {
+    drawing = true;
+  });
+
+  cvs.addEventListener('mouseup', function(e) {
+    drawing = false;
+  });
+
+  cvs.addEventListener('mouseleave', function(e) {
+    drawing = false;
+  });
+
+  cvs.addEventListener('mousemove', function(e) {
+    if (! drawing) return;
+
     const clickX = e.offsetX;
     const clickY = e.offsetY;
 
